@@ -1,0 +1,59 @@
+const Db = require('../utils/db');
+const { ErrorHandler } = require('../utils/errorHandler');
+class Cuenta {
+    constructor(idCuenta, descrip, vigente) {
+        this.idCuenta = idCuenta
+        this.descrip = descrip
+        this.vigente = vigente
+    }
+
+    static async get(id) {
+        try {
+            var rta = await Db.llamarSP('getCuenta', { idCuenta: id })
+            var ret = new Cuenta()
+            if (rta && rta[0] && rta[0][0]) {
+                ret.idCuenta = rta[0][0].idCuenta
+                ret.descrip = rta[0][0].descrip
+                ret.vigente = rta[0][0].vigente
+            }
+            return ret;
+        } catch (error) {
+            throw error
+        }
+    }
+
+    static async insert(obj) {
+        if (!(obj instanceof Cuenta)) { throw new ErrorHandler('Error parametros API', 400); }
+        try {
+            delete obj.idCuenta
+            var rta = await Db.llamarSP('insertCuenta', obj);
+        } catch (e) {
+            throw e
+        }
+    }
+
+    static async update(obj) {
+        if (!(obj instanceof Cuenta)) { throw new ErrorHandler('Error parametros API', 400); }
+        try {
+            var rta = await Db.llamarSP('updateCuenta', obj);
+        } catch (e) {
+            throw e
+        }
+    }
+
+    static async delete(obj) {
+        if (!(obj instanceof Cuenta)) { throw new ErrorHandler('Error parametros API', 400); }
+        try {
+            delete obj.descrip
+            delete obj.vigente
+            console.log(obj);
+            var rta = await Db.llamarSP('deleteCuenta', obj);
+        } catch (e) {
+            throw e
+        }
+    }
+
+}
+
+
+module.exports = Cuenta
